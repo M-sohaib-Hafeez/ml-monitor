@@ -7,8 +7,9 @@ import json
 
 router = APIRouter()
 
-GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
-GEMINI_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-8b:generateContent"
+GROQ_API_KEY = os.getenv("GROQ_API_KEY", "")
+GROQ_URL = "https://api.groq.com/openai/v1/chat/completions"
+GROQ_MODEL = "llama-3.3-70b-versatile"
 
 class InsightRequest(BaseModel):
     context: str
@@ -22,23 +23,30 @@ class RetrainingRequest(BaseModel):
     dataset_size: Optional[int] = None
     deployment_context: Optional[str] = None
 
-async def call_gemini(system_prompt: str, user_message: str) -> str:
-    if not GEMINI_API_KEY:
-        return "Gemini API key not configured. Please set GEMINI_API_KEY environment variable."
-    full_prompt = f"{system_prompt}\n\n{user_message}"
+async def call_groq(system_prompt: str, user_message: str) -> str:
+    if not GROQ_API_KEY:
+        return "Groq API key not configured. Please set GROQ_API_KEY environment variable."
     async with httpx.AsyncClient(timeout=60.0) as client:
         response = await client.post(
-            f"{GEMINI_URL}?key={GEMINI_API_KEY}",
-            headers={"Content-Type": "application/json"},
+            GROQ_URL,
+            headers={
+                "Authorization": f"Bearer {GROQ_API_KEY}",
+                "Content-Type": "application/json",
+            },
             json={
-                "contents": [{"parts": [{"text": full_prompt}]}],
-                "generationConfig": {"maxOutputTokens": 1024, "temperature": 0.4},
+                "model": GROQ_MODEL,
+                "messages": [
+                    {"role": "system", "content": system_prompt},
+                    {"role": "user",   "content": user_message},
+                ],
+                "max_tokens": 1024,
+                "temperature": 0.4,
             },
         )
         if response.status_code != 200:
-            raise HTTPException(status_code=502, detail=f"Gemini API error: {response.text}")
+            raise HTTPException(status_code=502, detail=f"Groq API error: {response.text}")
         data = response.json()
-        return data["candidates"][0]["content"]["parts"][0]["text"]
+        return data["choices"][0]["message"]["content"]
 
 @router.post("/analyze")
 async def get_insights(req: InsightRequest):
@@ -55,8 +63,7 @@ async def get_insights(req: InsightRequest):
         parts.append(f"Model Performance Metrics: {json.dumps(req.model_metrics, indent=2)}")
     if req.question:
         parts.append(f"Specific Question: {req.question}")
-    user_message = "\n\n".join(parts)
-    insight = await call_gemini(system, user_message)
+    insight = await call_groq(system, "\n\n".join(parts))
     return {"insight": insight, "context": req.context}
 
 @router.post("/retraining-plan")
@@ -78,7 +85,7 @@ async def get_retraining_plan(req: RetrainingRequest):
         f"Deployment Context: {req.deployment_context or 'Production ML System'}\n\n"
         "Please generate a comprehensive retraining plan."
     )
-    plan = await call_gemini(system, user_message)
+    plan = await call_groq(system, user_message)
     return {"retraining_plan": plan, "drift_severity": req.drift_results.get("severity", "Unknown")}
 
 @router.post("/explain-drift")
@@ -93,5 +100,5 @@ async def explain_drift(req: InsightRequest):
         f"Context: {req.context}\n"
         "Explain what this drift means and why it matters."
     )
-    explanation = await call_gemini(system, user_message)
+    explanation = await call_groq(system, user_message)
     return {"explanation": explanation}
