@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import { Outlet, NavLink, useLocation } from 'react-router-dom'
 import {
   LayoutDashboard, GitBranch, BarChart2,
-  Brain, RefreshCw, Menu, X, Activity
+  Brain, RefreshCw, Database, Menu, X, Activity
 } from 'lucide-react'
 
 const navItems = [
@@ -11,6 +11,7 @@ const navItems = [
   { to: '/model',   icon: BarChart2,       label: 'Model Evaluator' },
   { to: '/insights',icon: Brain,           label: 'AI Insights' },
   { to: '/retrain', icon: RefreshCw,       label: 'Retrain Planner' },
+  { to: '/history', icon: Database,       label: 'History (DB)' },
 ]
 
 export default function Layout() {

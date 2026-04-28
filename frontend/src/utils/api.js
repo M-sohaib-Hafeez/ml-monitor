@@ -49,3 +49,9 @@ export const uploadCSVPair = (baseline, current) => {
 }
 
 export default api
+
+export const getDriftHistory = () =>
+  api.get('/api/drift/history').then(r => r.data)
+
+export const getModelHistory = () =>
+  api.get('/api/model/history').then(r => r.data)
