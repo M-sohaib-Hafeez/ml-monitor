@@ -11,7 +11,7 @@ A full-stack platform to detect data drift, evaluate model performance degradati
 | Service | URL | Description |
 |---------|-----|-------------|
 | 🖥️ **Frontend** | [ml-monitor-beryl.vercel.app](https://ml-monitor-beryl.vercel.app/) | Live React app hosted on Vercel |
-| ⚙️ **Backend API** | [ml-monitor-production.up.railway.app](https://ml-monitor-production.up.railway.app/) | FastAPI backend hosted on Railway |
+| ⚙️ **Backend API** | [ml-monitor-production.up.railway.app](https://ml-monitor-production.up.railway.app/) | FastAPI backend hosted on Railway (till 5/28/2026) |
 | 📖 **API Docs** | [ml-monitor-production.up.railway.app/docs](https://ml-monitor-production.up.railway.app/docs) | Interactive Swagger UI for all API endpoints |
 
 ---
