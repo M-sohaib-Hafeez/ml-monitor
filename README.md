@@ -2,7 +2,7 @@
 
 > **SE Project** — *Challenges in Maintaining Machine Learning-Based Systems: Data Drift & Model Retraining*
 
-A full-stack platform to detect data drift, evaluate model performance degradation, and generate AI-powered retraining plans using Claude.
+A full-stack platform to detect data drift, evaluate model performance degradation, and generate AI-powered retraining plans
 
 ---
 
